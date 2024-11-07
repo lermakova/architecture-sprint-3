@@ -1,0 +1,28 @@
+@startuml
+!pragma layout smetana
+title Smart Home Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы управления отоплением")
+Person(admin, "Administrator", "Специалист  по подключению системы отопления")
+System(SmartHomeSystem, "SmartHome System", "Система организации удалённого управления отоплением")
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(App, "Web Application", "Java", "Взаимодействует с пользователями")
+  Container(HeatingSystemService, "Heating System Service", "Java", "Обрабатывает запросы управления отоплением")
+  Container(Database, "Database", "PostgreSQL", "Хранит данные датчиков")
+}
+
+System_Ext(temperatureSensor, "Датчик температуры", "Датчик контроля температуры")
+System_Ext(heatingSystem, "Система отопления", "Внешняя система управления отоплением")
+
+Rel(user, App, "Управляет отоплением, проверяет температуру")
+Rel(admin, App,"Подключает датчики к системе")
+Rel(App,HeatingSystemService,"Отправляет запросы управления системой отопления")
+Rel(HeatingSystemService,temperatureSensor,"Получает данные о температуре")
+Rel(HeatingSystemService,Database,"Запись/чтение данных системы")
+Rel(HeatingSystemService,heatingSystem,"Управляет устройствами системы отопления")
+@enduml

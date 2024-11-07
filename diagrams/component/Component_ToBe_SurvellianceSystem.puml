@@ -1,0 +1,27 @@
+@startuml
+!pragma layout smetana
+title Survelliance System Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(SurvellianceSystemAPIService, "Survelliance System Service", "Java", "Обрабатывает запросы управления видеонаблюдением")
+  Container(ApiGateway, "API Gateway", "Java", "Распределяет запросы, балансирует нагрузку")
+  Container(MessageBroker, "Message Broker", "Kafka", "Реализует асинхронное взаимодействие")
+  Container(Database, "Database", "PostgreSQL", "Хранит данные датчиков")
+}
+
+Container(SurvellianceSystemAPIService, "Survelliance System Service", "Java") {
+  Component(SurvellianceSystemController, "SurvellianceSystemController", "Обрабатывает запросы к системе")
+  Component(SurvellianceSystemService, "Service Layer", "Логика обработки запросов")
+  Component(SurvellianceSystemRepository, "Survelliance System Repository", "Работа с данными системы видеонаблюдения")
+}
+
+Rel(ApiGateway,SurvellianceSystemController,"Инициирует запросы к системе")
+Rel(SurvellianceSystemController,SurvellianceSystemService,"Вызывает бизнес-логику")
+Rel(SurvellianceSystemService,MessageBroker,"Запросы к устройствам системы видеонаблюдения")
+Rel(SurvellianceSystemService,SurvellianceSystemRepository,"Чтение/запись данных системы видеонаблюдения")
+Rel(SurvellianceSystemRepository,Database,"Чтение/запись данных системы видеонаблюдения")
+@enduml

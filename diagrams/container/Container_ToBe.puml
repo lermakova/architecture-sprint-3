@@ -1,0 +1,77 @@
+@startuml
+!pragma layout smetana
+title Smart Home Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы")
+Person(admin, "Administrator", "Специалист  по подключению системы")
+System(SmartHomeSystem, "SmartHome System", "Система организации удалённого управления устройствами умного дома")
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(App, "Web Application", "Java", "Взаимодействует с пользователями")
+  Container(ApiGateway, "API Gateway", "Java", "Распределяет запросы, балансирует нагрузку")
+  Container(MessageBroker, "Message Broker", "Kafka", "Реализует асинхронное взаимодействие")
+  Container(UserService, "User Service", "Java", "Обрабатывает запросы настройки системы")
+  Container(TelemetryService, "Telemetry Service", "Java", "Обрабатывает запросы получения данных с датчиков")
+  Container(HeatingSystemService, "Heating System Service", "Java", "Обрабатывает запросы управления отоплением")
+  Container(LightManagementSystemService, "Light Management System Service", "Java", "Обрабатывает запросы управления освещением")
+  Container(GatesSystemService, "Gates System Service", "Java", "Обрабатывает запросы управления воротами")
+  Container(SurvellianceSystemService, "Survelliance System Service", "Java", "Обрабатывает запросы управления наблюдением")
+  Container(UserServiceDatabase, "User Service Database", "PostgreSQL", "Хранит данные устройств пользователя")
+  Container(TelemetryServiceDatabase, "Telemetry Service Database", "PostgreSQL", "Хранит данные датчиков")
+  Container(HeatingSystemServiceDatabase, "Heating System Service Database", "PostgreSQL", "Хранит данные системы отопления")
+  Container(LightManagementSystemServiceDatabase, "Light Management System Service Database", "PostgreSQL", "Хранит данные системы освещения")
+  Container(GatesSystemServiceDatabase, "Gates System Service Database", "PostgreSQL", "Хранит данные системы управления воротами")
+  Container(SurvellianceSystemServiceDatabase, "Survelliance System Service Database", "PostgreSQL", "Хранит данные системы наблюдения")
+}
+
+System_Ext(temperatureSensor, "Датчик температуры", "Датчик контроля температуры")
+System_Ext(lightSensor, "Датчик освещения", "Датчик контроля  освещения")
+System_Ext(gatesSensor, "Датчик данных ворот", "Датчик данных ворот")
+System_Ext(survellianceSensor, "Датчик данных системы наблюдения", "Датчик данных системы наблюдения")
+System_Ext(heatingSystem, "Система отопления", "Внешняя система управления отоплением")
+System_Ext(lightSystem, "Система освещения", "Внешняя система управления освещением")
+System_Ext(gatesSystem, "Система автоматических ворот", "Внешняя система управления воротами")
+System_Ext(survellianceSystem, "Система наблюдения", "Внешняя система управления наблюдением")
+
+Rel(user, App, "Управляет устройствами")
+Rel(user, App, "Подключает датчики к системе")
+Rel(admin, App,"Подключает датчики к системе")
+Rel(App, ApiGateway,"Обрабатывает запросы клиента")
+Rel(ApiGateway, MessageBroker,"Запрашивает данные")
+Rel(MessageBroker, ApiGateway,"Отправляет актуальные данные")
+
+Rel(ApiGateway,UserService,"Отправляет запросы подключения и настройки систем")
+Rel(ApiGateway,TelemetryService,"Отправляет запросы получения данных с датчиков")
+Rel(ApiGateway,HeatingSystemService,"Отправляет запросы управления системой отопления")
+Rel(ApiGateway,LightManagementSystemService,"Отправляет запросы управления системой освещения")
+Rel(ApiGateway,GatesSystemService,"Отправляет запросы управления воротами")
+Rel(ApiGateway,SurvellianceSystemService,"Отправляет запросы управления системой наблюдения")
+
+Rel(TelemetryService,TelemetryServiceDatabase,"Запись/чтение данных датчиков")
+Rel(MessageBroker,TelemetryService,"Публикует данные с датчиков")
+Rel(UserService,UserServiceDatabase,"Запись/чтение данных о настройках/устройствах системы")
+
+Rel(temperatureSensor,MessageBroker,"Отправляет данные о температуре")
+Rel(HeatingSystemService,HeatingSystemServiceDatabase,"Запись/чтение данных системы отопления")
+Rel(HeatingSystemService,MessageBroker,"Запросы к устройствам системы отопления")
+Rel(MessageBroker,heatingSystem,"Публикует запросы к устройствам системы отопления")
+
+Rel(lightSensor,MessageBroker,"Отправляет данные об освещении")
+Rel(LightManagementSystemService,LightManagementSystemServiceDatabase,"Запись/чтение данных системы освещения")
+Rel(LightManagementSystemService,MessageBroker,"Запросы к устройствам системы освещения")
+Rel(MessageBroker,lightSystem,"Публикует запросы к устройствам системы освещения")
+
+Rel(gatesSensor,MessageBroker,"Отправляет данные о воротах")
+Rel(GatesSystemService,GatesSystemServiceDatabase,"Запись/чтение данных системы управления воротами")
+Rel(GatesSystemService,MessageBroker,"Запросы к устройствам системы управления воротами")
+Rel(MessageBroker,gatesSystem,"Публикует запросы к устройствам системы управления воротами")
+
+Rel(survellianceSensor,MessageBroker,"Отправляет данные о системе наблюдения")
+Rel(SurvellianceSystemService,SurvellianceSystemServiceDatabase,"Запись/чтение данных системы наблюдения")
+Rel(SurvellianceSystemService,MessageBroker,"Запросы к устройствам системы наблюдения")
+Rel(MessageBroker,survellianceSystem,"Публикует запросы к устройствам системы наблюдения")
+@enduml
