@@ -53,8 +53,7 @@ entity "Module" as module {
 entity "TelemetryData" as telemetry_data {
   *telemetry_data_id : number <<generated>>
   --
-  *device_id : number 
-  *module_id : number
+  *module_id : number <<FK>>
   *date : timestamp
   *status : text
   *message : text
@@ -65,4 +64,6 @@ house ||..o{ device
 device_type ||..o{ device
 device ||..o{ module
 module_type ||..o{ module
+module ||..o{ telemetry_data
+
 @enduml

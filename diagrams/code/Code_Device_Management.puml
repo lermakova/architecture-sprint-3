@@ -10,10 +10,10 @@ database    Database    as database
 
 user -> api_gateway : Запрос на управление устройствами
 api_gateway -> service : Запрос к сервису устройства
-service -> message_broker : Публикация запроса в очередь
-message_broker -> service : Публикация актуальных данных
 service -> database : Сохранение данных устройства в базу данных
 database -> service : Получение данных
 service -> api_gateway : Результат запроса
 api_gateway -> user : Результат запроса
+user -> api_gateway : Асинхронный запрос
+api_gateway -> message_broker : Публикация запроса в очередь
 @enduml
