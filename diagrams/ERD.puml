@@ -48,6 +48,7 @@ entity "Module" as module {
   *name : text
   *serial_number : text
   *status : text
+  *value : text
 }
 
 entity "TelemetryData" as telemetry_data {

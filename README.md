@@ -24,3 +24,39 @@
 /diagrams/component/Component_AsIs.puml - AsIs диаграмма компонентов
 /diagrams/component/Component_..._ToBe.puml - ToBe диаграммы компонентов
 /diagrams/code - диаграммы кода
+
+
+#api
+Исходя из целей, преедлагается разработать следующие эндпоинты (подробное описание api находится в файле api.yaml):
+
+User
+GET /devices - Возвращает список устройств пользователя
+POST /devices - Добавляет новое устройство пользователя
+DELETE /devices/{id} - Удалить устройство
+GET /devices/{id} - Получить устройство по Id
+PATCH /devices/{id} - Обновить настройки устройства
+
+Telemetry
+GET /telemetry - Возвращает данные по всем датчикам
+GET /telemtry/{id} - Получить данные датчика по Id
+GET /telemetry/findByDate - Возвращает данные датчиков за конкретную дату
+
+Heating System
+POST /heating - Возвращает статус системы отпления (ыкл/выкл)
+GET /heating - Отправляет запрос на включение/отключение системы отопления
+PUT /heating - Устанавливает значение температуры
+
+Light Mangement System
+POST /light - Возвращает статус системы освещения
+GET /light - Отправляет запрос на включение/отключение системы освещения
+PUT /light/{request} - Устанавливает параметры системы освещения
+
+Gates System
+POST /gates - Отправляет запрос на открытие/закрытие ворот
+GET /gates - Возвращает статус ворот (открыты/закрыты)
+
+Survelliance System
+POST /survelliance - Отправляет запрос на включение/отключение системы видеонаблюдения
+GET /survelliance - Возвращает статус системы видеонаблюдения
+POST /survelliance/{moduleId} - Отправляет запрос на включение/отключение камеры по Id
+GET /survelliance/{moduleId} - Возвращает статус камеры по Id
