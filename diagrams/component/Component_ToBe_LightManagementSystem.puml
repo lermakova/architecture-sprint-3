@@ -1,0 +1,27 @@
+@startuml
+!pragma layout smetana
+title Light Management System Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(LightManagementSystemAPIService, "Light Management System Service", "Java", "Обрабатывает запросы управления освещением")
+  Container(ApiGateway, "API Gateway", "Java", "Распределяет запросы, балансирует нагрузку")
+  Container(MessageBroker, "Message Broker", "Kafka", "Реализует асинхронное взаимодействие")
+  Container(Database, "Database", "PostgreSQL", "Хранит данные датчиков")
+}
+
+Container(LightManagementSystemAPIService, "Light Management System Service", "Java") {
+  Component(LightManagementSystemController, "LightManagementSystemController", "Обрабатывает запросы к системе")
+  Component(LightManagementSystemService, "Service Layer", "Логика обработки запросов")
+  Component(LightManagementSystemRepository, "LightManagement System Repository", "Работа с данными системы освещения")
+}
+
+Rel(ApiGateway,LightManagementSystemController,"Инициирует запросы к системе")
+Rel(LightManagementSystemController,LightManagementSystemService,"Вызывает бизнес-логику")
+Rel(LightManagementSystemService,MessageBroker,"Запросы к устройствам системы освещения")
+Rel(LightManagementSystemService,LightManagementSystemRepository,"Чтение/запись данных системы освещения")
+Rel(LightManagementSystemRepository,Database,"Чтение/запись данных системы освещения")
+@enduml

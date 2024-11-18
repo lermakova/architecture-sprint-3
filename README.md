@@ -1,85 +1,62 @@
-# Базовая настройка
+#Анализ текущего решения:
 
-## Запуск minikube
+Текущее монолитное решение не соответствует целям компании, так как является сложно масштабируемым (в будущем планируется увеличение количества поддерживаемых систем, а так же реализация возможности их дальнейшего расширения). Также, текущее решение поддерживает только синхронные вызовы, что, при реализации дальнейших целей, будет создавать задержки, проблемы с производительностью и неравномерному распределению нагрузки. Кроме того, узким местом является необходимость остановки всего решения для развертывания приложения, что необходимо исправить в рамках дальнейшей разработки.
 
-[Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
+#В связи с этим предлагается:
 
-```bash
-minikube start
-```
+Выделить в приложении следующие домены, соответствующие бизнес-задачам(в рамках принципов DDD):
+1. User Service - сервис управления пользователями и устройствами пользователей
+2. Telemetry Service - сервис обработки и хранения данных, получаемых с датчиков
+3. Heating system service - сервис управления системой отопления
+4. Light management system service - сервис управления системой освещения
+5. Gates system service - сервис управления автоматическими воротами
+6. Survelliance system service - сервис управления видеонаблюдением
 
-## Добавление токена авторизации GitHub
+Также, предлагается добавить асинхронное взаимодействие сервисам (например, с использованием Kafka), а также разработать API Gateway для распределения запросов и управления балансировкой нагрузки.
 
-[Получение токена](https://github.com/settings/tokens/new)
+#Пути к диаграммам C4
 
-```bash
-kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
-```
+/diagrams - директория, содержащая диаграммы
+/diagrams/ERD.puml - ER-diagram 
+/diagrams/context/Context.puml - диаграмма контекста
+/diagrams/container/Container_AsIs.puml - AsIs диаграмма контейнеров
+/diagrams/container/Container_ToBe.puml - ToBe диаграмма контейнеров
+/diagrams/component/Component_AsIs.puml - AsIs диаграмма компонентов
+/diagrams/component/Component_..._ToBe.puml - ToBe диаграммы компонентов
+/diagrams/code - диаграммы кода
 
-## Установка API GW kusk
 
-[Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
+#api
+Исходя из целей, преедлагается разработать следующие эндпоинты (подробное описание api находится в файле api.yaml):
 
-```bash
-kusk cluster install
-```
+User
+GET /devices - Возвращает список устройств пользователя
+POST /devices - Добавляет новое устройство пользователя
+DELETE /devices/{id} - Удалить устройство
+GET /devices/{id} - Получить устройство по Id
+PATCH /devices/{id} - Обновить настройки устройства
 
-## Смена адреса образа в helm chart
+Telemetry
+GET /telemetry - Возвращает данные по всем датчикам
+GET /telemtry/{id} - Получить данные датчика по Id
+GET /telemetry/findByDate - Возвращает данные датчиков за конкретную дату
 
-После того как вы сделали форк репозитория и у вас в репозитории отработал GitHub Action. Вам нужно получить адрес образа <https://github.com/><github_username>/architecture-sprint-3/pkgs/container/architecture-sprint-3
+Heating System
+POST /heating - Возвращает статус системы отпления (ыкл/выкл)
+GET /heating - Отправляет запрос на включение/отключение системы отопления
+PUT /heating - Устанавливает значение температуры
 
-Он выглядит таким образом
-```ghcr.io/<github_username>/architecture-sprint-3:latest```
+Light Mangement System
+POST /light - Возвращает статус системы освещения
+GET /light - Отправляет запрос на включение/отключение системы освещения
+PUT /light/{request} - Устанавливает параметры системы освещения
 
-Замените адрес образа в файле `helm/smart-home-monolith/values.yaml` на полученный файл:
+Gates System
+POST /gates - Отправляет запрос на открытие/закрытие ворот
+GET /gates - Возвращает статус ворот (открыты/закрыты)
 
-```yaml
-image:
-  repository: ghcr.io/<github_username>/architecture-sprint-3
-  tag: latest
-```
-
-## Настройка terraform
-
-[Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
-
-Создайте файл ~/.terraformrc
-
-```hcl
-provider_installation {
-  network_mirror {
-    url = "https://terraform-mirror.yandexcloud.net/"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-```
-
-## Применяем terraform конфигурацию
-
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-## Настройка API GW
-
-```bash
-kusk deploy -i api.yaml
-```
-
-## Проверяем работоспособность
-
-```bash
-kubectl port-forward svc/kusk-gateway-envoy-fleet -n kusk-system 8080:80
-curl localhost:8080/hello
-```
-
-## Delete minikube
-
-```bash
-minikube delete
-```
+Survelliance System
+POST /survelliance - Отправляет запрос на включение/отключение системы видеонаблюдения
+GET /survelliance - Возвращает статус системы видеонаблюдения
+POST /survelliance/{moduleId} - Отправляет запрос на включение/отключение камеры по Id
+GET /survelliance/{moduleId} - Возвращает статус камеры по Id

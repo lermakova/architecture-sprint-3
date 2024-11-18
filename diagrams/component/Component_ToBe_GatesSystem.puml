@@ -1,0 +1,27 @@
+@startuml
+!pragma layout smetana
+title Gates System Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(GatesSystemAPIService, "Gates System Service", "Java", "Обрабатывает запросы управления воротами")
+  Container(ApiGateway, "API Gateway", "Java", "Распределяет запросы, балансирует нагрузку")
+  Container(MessageBroker, "Message Broker", "Kafka", "Реализует асинхронное взаимодействие")
+  Container(Database, "Database", "PostgreSQL", "Хранит данные датчиков")
+}
+
+Container(GatesSystemAPIService, "Gates System Service", "Java") {
+  Component(GatesSystemController, "GatesSystemController", "Обрабатывает запросы к системе")
+  Component(GatesSystemService, "Service Layer", "Логика обработки запросов")
+  Component(GatesSystemRepository, "Gates System Repository", "Работа с данными ворот")
+}
+
+Rel(ApiGateway,GatesSystemController,"Инициирует запросы к системе")
+Rel(GatesSystemController,GatesSystemService,"Вызывает бизнес-логику")
+Rel(GatesSystemService,MessageBroker,"Запросы к устройствам ворот")
+Rel(GatesSystemService,GatesSystemRepository,"Чтение/запись данных ворот")
+Rel(GatesSystemRepository,Database,"Чтение/запись данных ворот")
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+!pragma layout smetana
+title SmartHome Context Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы управления отоплением")
+Person(admin, "Administrator", "Специалист  по подключению системы отопления")
+System(SmartHomeSystem, "SmartHome System", "Система организации удалённого управления отоплением")
+
+System_Ext(temperatureSensor, "Датчик температуры", "Датчик контроля температуры")
+System_Ext(heatingSystem, "Система отопления", "Внешняя система управления отоплением")
+
+Rel(user, SmartHomeSystem, "Управляет отоплением, проверяет температуру")
+Rel(admin, SmartHomeSystem,"Подключает датчики к системе")
+Rel(SmartHomeSystem,temperatureSensor,"Получает данные о температуре")
+Rel(SmartHomeSystem,heatingSystem,"Включает и выключает отопление")
+
+@enduml
